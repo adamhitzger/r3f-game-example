@@ -1,10 +1,22 @@
 import { Box, OrbitControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { RigidBody, RapierRigidBody } from "@react-three/rapier";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Controls } from "./Scene";
+import { insertCoin, onPlayerJoin, Joystick } from "playroomkit";
+import Map from "./Map";
+import Character from "./Character";
 
 export default function Expirience() {
+    const [players, setPlayers] = useState([]);
+    const start = async () => {
+        await insertCoin();
+
+        onPlayerJoin((state) => new Joystick(state, {
+            type: "angular"
+        }))
+    }
+
     const box = useRef<RapierRigidBody>(null!);
     const leftPress = useKeyboardControls<Controls>(state => state.left);
     const rightPress = useKeyboardControls<Controls>(state => state.right);
@@ -25,17 +37,9 @@ export default function Expirience() {
         <>
             <ambientLight intensity={0.5}/>
             <OrbitControls/>
-
-            <RigidBody
-                position={[-2.5, 1, 0]}
-                ref={box}
-            >
-                <Box material-color="blue"/>
-            </RigidBody>
-
-            <RigidBody type="fixed" name="floor">
-                <Box position={[0,0,0]} args={[10,1,10]} material-color="springgreen"/>
-            </RigidBody>
+            <Character myref={box} />
+            
+            <Map/>
         </>
     )
 }
